@@ -1,8 +1,13 @@
 #include <Windows.h>
+#include "WindowsMessageMap.h"
 
 // HWND hWnd ウィンドウハンドル(型)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	static WindowsMessageMap mm;
+	// デバッグウィンドの出力(std::stringからcharのポインタを取り出す)
+	OutputDebugString(mm(msg, lParam, wParam).c_str());
+
 	switch (msg)
 	{
 	case WM_CLOSE:
