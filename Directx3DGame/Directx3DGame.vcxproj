@@ -152,9 +152,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyException.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowsMessageMap.h" />
     <ClInclude Include="MyWindows.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Directx3DGame.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="AppIcon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
