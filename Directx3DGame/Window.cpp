@@ -112,10 +112,31 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	switch (msg)
 	{
 
+
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		return 0;
+		// キーステートをクリア
+	case WM_KILLFOCUS:
+		keyboard.ClearState();
+		break;
+		// キーボードメッセージ
+	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
+		if (!(lParam & 0x40000000) || keyboard.AutorepeatIsEnabled()) // filter autorepeat
+		{
+			keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
+		}
+		break;
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+		keyboard.OnKerReleased(static_cast<unsigned char>(wParam));
+		break;
+	case WM_CHAR:
+		keyboard.OnChar(static_cast<unsigned char>(wParam));
+		break;
 	}
+
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
