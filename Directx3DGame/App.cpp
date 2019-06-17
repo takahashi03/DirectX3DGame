@@ -23,8 +23,7 @@ int App::Go()
 
 void App::DoFrame()
 {
-	const float t = timer.Peek();
-	std::ostringstream oss;
-	oss << "Time elapsed: " << std::fixed << t << "s";
-	window.SetTitle(oss.str());
+	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
+	window.Gfx().ClearBuffer(c, c, 1.0f);
+	window.Gfx().EndFrame();
 }
