@@ -1,8 +1,10 @@
 #include "App.h"
+#include <sstream>
+#include <iomanip>
 
 App::App()
 	:
-	wnd(800, 600, "Title")
+	window(800, 600, "Title")
 {}
 
 int App::Go()
@@ -21,5 +23,8 @@ int App::Go()
 
 void App::DoFrame()
 {
-
+	const float t = timer.Peek();
+	std::ostringstream oss;
+	oss << "Time elapsed: " << std::fixed << t << "s";
+	window.SetTitle(oss.str());
 }
