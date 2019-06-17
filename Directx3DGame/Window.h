@@ -2,6 +2,8 @@
 #include "MyWindows.h"
 #include "MyException.h"
 #include "Keyboard.h"
+#include "Mouse.h"
+#include <optional>
 
 class Window
 {
@@ -18,29 +20,6 @@ public:
 	private:
 		HRESULT hresult;
 	};
-	//{
-	//	using MyException::MyException;
-	//public:
-	//	static std::string TranslateErrorCode(HRESULT hresult) noexcept;
-	//};
-	//class HresultException : public Exception
-	//{
-	//public:
-	//	HresultException(int line, const char* file, HRESULT hresult) noexcept;
-	//	const char* what() const noexcept override;
-	//	const char* GetType() const noexcept override;
-	//	HRESULT GetErrorCode() const noexcept;
-	//	std::string GetErrorDescription() const noexcept;
-	//private:
-	//	HRESULT hresult;
-	//};
-	//class NoGfxException : public Exception
-	//{
-	//public:
-	//	using Exception::Exception;
-	//	const char* GetType() const noexcept override;
-	//};
-
 private:
 	// シングルトンはウィンドウクラスの登録 / クリーンアップを管理
 	class WindowClass
@@ -63,12 +42,15 @@ public:
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator = (const Window&) = delete;
+	void SetTitle(const std::string& title);
+	static std::optional<int> ProcessMessages();
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 public:
 	Keyboard keyboard;
+	Mouse mouse;
 private:
 	int width;
 	int height;
