@@ -2,6 +2,7 @@
 #include "MyWindows.h"
 #include "MyException.h"
 #include <d3d11.h>
+#include <wrl.h>
 #include <vector>
 #include "DxgiInfoManager.h"
 
@@ -38,7 +39,7 @@ public:
 	Graphics(HWND hWnd);
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
-	~Graphics();
+	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue) noexcept;
 private:
@@ -46,10 +47,11 @@ private:
 	DxgiInfoManager infoManager;
 #endif
 	// Directx11のデバイス
-	ID3D11Device* pDevice = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 	// 画面出力用のスワップチェイン
-	IDXGISwapChain* pSwap = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
 	// 描画用のデバイスコンテキスト
-	ID3D11DeviceContext* pContext = nullptr;
-	ID3D11RenderTargetView* pTarget = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 };
