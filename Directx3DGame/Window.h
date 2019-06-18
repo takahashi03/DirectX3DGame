@@ -12,15 +12,26 @@ class Window
 public:
 	class Exception :public MyException
 	{
+		using MyException::MyException;
 	public:
-		Exception(int line, const char* file, HRESULT hresult)noexcept;
+		static std::string TranslateErrorCode(HRESULT hresult)noexcept;
+	};
+	class HresultException: public Exception
+	{
+	public:
+		HresultException(int line, const char* file, HRESULT hresult)noexcept;
 		const char* what() const noexcept override;
 		virtual const char* GetType() const noexcept;
-		static std::string TranslateErrorCode(HRESULT hresult)noexcept;
 		HRESULT GetErrorCode() const noexcept;
-		std::string GetErrorString() const noexcept;
+		std::string GetErrorDescription() const noexcept;
 	private:
 		HRESULT hresult;
+	};
+	class NoGfxException : public Exception
+	{
+	public:
+		using Exception::Exception;
+		const char* GetType() const noexcept override;
 	};
 private:
 	// シングルトンはウィンドウクラスの登録 / クリーンアップを管理
@@ -64,6 +75,7 @@ private:
 };
 
 // 例外エラーのヘルパーマクロ
-#define CHWND_EXCEPT(hresult)Window::Exception(__LINE__,__FILE__,hresult)
-#define CHWND_LAST_EXCEPT() Window::Exception(__LINE__,__FILE__,GetLastError())
+#define CHWND_EXCEPT( hresult ) Window::HresultException( __LINE__,__FILE__,(hresult) )
+#define CHWND_LAST_EXCEPT() Window::HresultException( __LINE__,__FILE__,GetLastError() )
+#define CHWND_NOGFX_EXCEPT() Window::NoGfxException( __LINE__,__FILE__ )
 

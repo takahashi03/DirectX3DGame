@@ -116,6 +116,10 @@ std::optional<int> Window::ProcessMessages()
 
 Graphics & Window::Gfx()
 {
+	if (!pGfx)
+	{
+		throw CHWND_NOGFX_EXCEPT();
+	}
 	return *pGfx;
 }
 
@@ -253,55 +257,62 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 }
 
 // 例外ウィンドウ
-Window::Exception::Exception(int line, const char * file, HRESULT hresult) noexcept
+std::string Window::Exception::TranslateErrorCode(HRESULT hresult) noexcept
+{
+	char* pMsgBuf = nullptr;
+	// windows will allocate memory for err string and make our pointer point to it
+	const DWORD nMsgLen = FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr, hresult, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr
+	);
+	// 0 string length returned indicates a failure
+	if (nMsgLen == 0)
+	{
+		return "Unidentified error code";
+	}
+	// copy error string from windows-allocated buffer to std::string
+	std::string errorString = pMsgBuf;
+	// free windows buffer
+	LocalFree(pMsgBuf);
+	return errorString;
+}
+
+Window::HresultException::HresultException(int line, const char * file, HRESULT hresult) noexcept
 	:
-	MyException(line, file),
+	Exception(line, file),
 	hresult(hresult)
 {}
 
-const char * Window::Exception::what() const noexcept
+const char * Window::HresultException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << GetType() << std::endl
-		<< "[Error Code]" << GetErrorCode() << std::endl
-		<< "[Description]" << GetErrorString() << std::endl
+		<< "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
+		<< std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
+		<< "[Description] " << GetErrorDescription() << std::endl
 		<< GetOriginString();
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
 
-const char * Window::Exception::GetType() const noexcept
+const char * Window::HresultException::GetType() const noexcept
 {
 	return "My Window Exception";
 }
 
-std::string Window::Exception::TranslateErrorCode(HRESULT hresult) noexcept
-{
-	char* pMsgBuffer = nullptr;
-	DWORD nMsgLength = FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr, hresult, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		reinterpret_cast<LPSTR>(&pMsgBuffer), 0, nullptr);
-
-	// 文字列が0だった場合
-	if (nMsgLength == 0)
-	{
-		// 未確認エラーコード
-		return "Unidentified error code";
-	}
-	std::string errorString = pMsgBuffer;
-	LocalFree(pMsgBuffer);
-	return errorString;
-}
-
-HRESULT Window::Exception::GetErrorCode() const noexcept
+HRESULT Window::HresultException::GetErrorCode() const noexcept
 {
 	return hresult;
 }
 
-std::string Window::Exception::GetErrorString() const noexcept
+std::string Window::HresultException::GetErrorDescription() const noexcept
 {
-	return TranslateErrorCode(hresult);
+	return Exception::TranslateErrorCode(hresult);
+}
+
+const char* Window::NoGfxException::GetType() const noexcept
+{
+	return "My Window Exception [No Graphics]";
 }
