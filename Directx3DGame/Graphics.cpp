@@ -25,7 +25,6 @@ namespace wrl = Microsoft::WRL;
 #define GFX_THROW_INFO_ONLY(call) (call)
 #endif
 
-// 初期化
 Graphics::Graphics(HWND hWnd)
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
@@ -59,7 +58,7 @@ Graphics::Graphics(HWND hWnd)
 	// for checking results of d3d functions
 	HRESULT hresult;
 
-	// デバイスの作成
+	// D3D11デバイスの作成
 	GFX_THROW_INFO(D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -104,7 +103,7 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
-void Graphics::DrawTestTriangle()
+void Graphics::DrawTestTriangle(float angle)
 {
 	HRESULT hresult;
 	struct Vertex
@@ -176,6 +175,39 @@ void Graphics::DrawTestTriangle()
 	// bind index buffer
 	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
+	// create constant buffer for transformation matrix
+	struct ConstantBuffer
+	{
+		struct
+		{
+			float element[4][4];
+		}transformation;
+	};
+	// ConstantBuffer transformaionの初期化
+	const ConstantBuffer cb =
+	{
+		{
+			(3.0f/4.0f)*std::cos(angle),std::sin(angle),0.0f,0.0f,
+			(3.0f / 4.0f)*-std::sin(angle),std::cos(angle),0.0f,0.0f,
+			0.0f,0.0f,1.0f,0.0f,
+			0.0f,0.0f,0.0f,1.0f,
+		}
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	D3D11_BUFFER_DESC cbd;
+	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd.Usage = D3D11_USAGE_DYNAMIC;
+	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbd.MiscFlags = 0u;
+	cbd.ByteWidth = sizeof(cb);
+	cbd.StructureByteStride = 0u;
+	D3D11_SUBRESOURCE_DATA csd = {};
+	csd.pSysMem = &cb;
+	GFX_THROW_INFO(pDevice->CreateBuffer(&cbd, &csd, &pConstantBuffer));
+
+	// bind constant
+	pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());;
 
 	// create pixel shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
