@@ -125,7 +125,7 @@ void Mouse::TrimBuffer() noexcept
 void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
 {
 	wheelDeltaCarry += delta;
-	// generate events for every 120 
+	// 120‚²‚Æ‚ÉƒCƒxƒ“ƒg‚ð¶¬
 	while (wheelDeltaCarry >= WHEEL_DELTA)
 	{
 		wheelDeltaCarry -= WHEEL_DELTA;

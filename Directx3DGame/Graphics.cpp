@@ -58,7 +58,7 @@ Graphics::Graphics(HWND hWnd)
 	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	// for checking results of d3d functions
+	// d3d関数の結果
 	HRESULT hresult;
 
 	// D3D11デバイスの作成
@@ -106,7 +106,7 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
-void Graphics::DrawTestTriangle(float angle, float x, float y)
+void Graphics::DrawTestTriangle(float angle, float x, float z)
 {
 	HRESULT hresult;
 
@@ -116,27 +116,22 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		{
 			float x;
 			float y;
-		} pos;
-		struct
-		{
-			unsigned char r;
-			unsigned char g;
-			unsigned char b;
-			unsigned char a;
-		} color;
+			float z;
+		} pos;		
 	};
 
-	// create vertex buffer (1 2d triangle at center of screen)
+	// 頂点バッファを作成
 	Vertex vertices[] =
 	{
-		{ 0.0f,0.5f,255,0,0,0 },
-		{ 0.5f,-0.5f,0,255,0,0 },
-		{ -0.5f,-0.5f,0,0,255,0 },
-		{ -0.3f,0.3f,0,255,0,0 },
-		{ 0.3f,0.3f,0,0,255,0 },
-		{ 0.0f,-1.0f,255,0,0,0 },
+		{ -1.0f,-1.0f,-1.0f	 },
+		{ 1.0f,-1.0f,-1.0f	 },
+		{ -1.0f,1.0f,-1.0f	 },
+		{ 1.0f,1.0f,-1.0f	  },
+		{ -1.0f,-1.0f,1.0f	 },
+		{ 1.0f,-1.0f,1.0f	  },
+		{ -1.0f,1.0f,1.0f	 },
+		{ 1.0f,1.0f,1.0f	 },
 	};
-	vertices[0].color.g = 255;
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
 	D3D11_BUFFER_DESC bd = {};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -149,19 +144,21 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 	sd.pSysMem = vertices;
 	GFX_THROW_INFO(pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer));
 
-	// Bind vertex buffer to pipeline
+	// 頂点バッファをパイプラインにバインド
 	const UINT stride = sizeof(Vertex);
 	const UINT offset = 0u;
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
 
-	// create index buffer
+	// インデックスバッファを作成
 	const unsigned short indices[] =
 	{
-		0,1,2,
-		0,2,3,
-		0,4,1,
-		2,1,5,
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
 	};
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC ibd = {};
@@ -175,11 +172,11 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 	isd.pSysMem = indices;
 	GFX_THROW_INFO(pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer));
 
-	// bind index buffer
+	// インデックスバッファを作成
 	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
 
-	// create constant buffer for transformation matrix
+	// 変換行列用の定数バッファを作成
 	struct ConstantBuffer
 	{
 		dx::XMMATRIX transform;
@@ -189,8 +186,9 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		{
 			dx::XMMatrixTranspose(
 				dx::XMMatrixRotationZ(angle) *
-				dx::XMMatrixScaling(3.0f / 4.0f,1.0f,1.0f) *
-				dx::XMMatrixTranslation(x,y,0.0f)
+				dx::XMMatrixRotationX(angle) *
+				dx::XMMatrixTranslation(x,0.0f,(z*2)+4.0f)*
+				dx::XMMatrixPerspectiveLH(1.0f,3.0f / 4.0f,0.5f,10.0f)
 			)
 		}
 	};
@@ -206,35 +204,68 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 	csd.pSysMem = &cb;
 	GFX_THROW_INFO(pDevice->CreateBuffer(&cbd, &csd, &pConstantBuffer));
 
-	// bind constant buffer to vertex shader
+	// 定数バッファを頂点シェーダーにバインド
 	pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
 
+	struct ConstantBuffer2
+	{
+		struct
+		{
+			float r;
+			float g;
+			float b;
+			float a;
+		} face_colors[6];
+	};
+	const ConstantBuffer2 cb2 =
+	{
+		{
+			{1.0f,0.0f,1.0f},
+			{1.0f,0.0f,0.0f},
+			{0.0f,1.0f,0.0f},
+			{0.0f,0.0f,1.0f},
+			{1.0f,1.0f,0.0f},
+			{0.0f,1.0f,1.0f},
+		}
+	};
+	wrl::ComPtr<ID3D11Buffer> pConstantBuffer2;
+	D3D11_BUFFER_DESC cbd2;
+	cbd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbd2.Usage = D3D11_USAGE_DEFAULT;
+	cbd2.CPUAccessFlags = 0u;
+	cbd2.MiscFlags = 0u;
+	cbd2.ByteWidth = sizeof(cb2);
+	cbd2.StructureByteStride = 0u;
+	D3D11_SUBRESOURCE_DATA csd2 = {};
+	csd2.pSysMem = &cb2;
+	GFX_THROW_INFO(pDevice->CreateBuffer(&cbd2, &csd2, &pConstantBuffer2));
 
-	// create pixel shader
+	// 定数バッファをピクセルシェーダーにバインド
+	pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer2.GetAddressOf());
+
+	// ピクセルシェーダーを作成
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	wrl::ComPtr<ID3DBlob> pBlob;
 	GFX_THROW_INFO(D3DReadFileToBlob(L"PixelShader.cso", &pBlob));
 	GFX_THROW_INFO(pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader));
 
-	// bind pixel shader
+	// ピクセルシェーダーをバインド
 	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 
-
-	// create vertex shader
+	// 頂点シェーダーを作成
 	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
 	GFX_THROW_INFO(D3DReadFileToBlob(L"VertexShader.cso", &pBlob));
 	GFX_THROW_INFO(pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader));
 
-	// bind vertex shader
+	// 頂点シェーダーをバインド
 	pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
 
 
-	// input (vertex) layout (2d position only)
+	// 入力レイアウト
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
-		{ "Position",0,DXGI_FORMAT_R32G32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-		{ "Color",0,DXGI_FORMAT_R8G8B8A8_UNORM,0,8u,D3D11_INPUT_PER_VERTEX_DATA,0 },
+		{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },		
 	};
 	GFX_THROW_INFO(pDevice->CreateInputLayout(
 		ied, (UINT)std::size(ied),
@@ -243,15 +274,15 @@ void Graphics::DrawTestTriangle(float angle, float x, float y)
 		&pInputLayout
 	));
 
-	// bind vertex layout
+	// 頂点レイアウトをバインド
 	pContext->IASetInputLayout(pInputLayout.Get());
 
 
-	// bind render target
+	// レンダ―ターゲットをバインド
 	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), nullptr);
 
 
-	// Set primitive topology to triangle list (groups of 3 vertices)
+	// プリミティブトロポジを三角形リストに設定
 	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 

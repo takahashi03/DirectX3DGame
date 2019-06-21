@@ -9,6 +9,7 @@ Window::WindowClass::WindowClass() noexcept
 	:
 	hInstance(GetModuleHandle(nullptr))
 {
+	// ウィンドウクラスの登録
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
@@ -16,6 +17,7 @@ Window::WindowClass::WindowClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
+	// アイコンの設定
 	wc.hIcon = static_cast<HICON>(LoadImage(
 		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
 		IMAGE_ICON, 32, 32, 0));
@@ -73,7 +75,7 @@ Window::Window(int width, int height, const char* name):
 		throw CHWND_LAST_EXCEPT();
 	}
 
-	// ウィンドウ表示？
+	// ウィンドウ表示
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
 
 	pGfx = std::make_unique<Graphics>(hWnd);
@@ -95,22 +97,22 @@ void Window::SetTitle(const std::string& title)
 std::optional<int> Window::ProcessMessages()
 {
 	MSG msg;
-	// while queue has messages, remove and dispatch them (but do not block on empty queue)
+	// メッセージがある間、削除してディスパッチ、空ではブロックしない
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
-		// check for quit because peekmessage does not signal this via return val
+		// 終了の確認
 		if (msg.message == WM_QUIT)
 		{
-			// return optional wrapping int (arg to PostQuitMessage is in wparam) signals quit
+			// シグナルの終了
 			return (int)msg.wParam;
 		}
 
-		// TranslateMessage will post auxilliary WM_CHAR messages from key msgs
+		// メッセージ
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
-	// return empty optional when not quitting app
+	// 終了しない場合、空のオプションを返す
 	return {};
 }
 
@@ -181,7 +183,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_MOUSEMOVE:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		// in client region -> log move, and log enter + capture mouse (if not previously in window)
+		
 		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
 		{
 			mouse.OnMouseMove(pt.x, pt.y);
@@ -190,15 +192,13 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 				SetCapture(hWnd);
 				mouse.OnMouseEnter();
 			}
-		}
-		// not in client -> log move / maintain capture if button down
+		}		
 		else
 		{
 			if (wParam & (MK_LBUTTON | MK_RBUTTON))
 			{
 				mouse.OnMouseMove(pt.x, pt.y);
-			}
-			// button up -> release capture / log event for leaving
+			}			
 			else
 			{
 				ReleaseCapture();
@@ -223,7 +223,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftReleased(pt.x, pt.y);
-		// release mouse if outside of window
+		// ウィンドウの外側にいる場合はマウスを離す
 		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
 		{
 			ReleaseCapture();
@@ -235,7 +235,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
-		// release mouse if outside of window
+		// ウィンドウの外側にいる場合はマウスを離す
 		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
 		{
 			ReleaseCapture();
@@ -260,21 +260,21 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 std::string Window::Exception::TranslateErrorCode(HRESULT hresult) noexcept
 {
 	char* pMsgBuf = nullptr;
-	// windows will allocate memory for err string and make our pointer point to it
+	// err文字列用のメモリの割り当て
 	const DWORD nMsgLen = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, hresult, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr
 	);
-	// 0 string length returned indicates a failure
+	// 0文字列長が返された場合失敗
 	if (nMsgLen == 0)
 	{
 		return "Unidentified error code";
 	}
-	// copy error string from windows-allocated buffer to std::string
+	// バッファからエラー文字列をコピーする
 	std::string errorString = pMsgBuf;
-	// free windows buffer
+	
 	LocalFree(pMsgBuf);
 	return errorString;
 }

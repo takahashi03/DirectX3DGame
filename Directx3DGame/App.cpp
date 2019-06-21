@@ -7,14 +7,14 @@ App::App()
 	window(800, 600, "Title")
 {}
 
+// マスタ―フレーム / メッセージループ
 int App::Go()
 {
 	while (true)
-	{
-		// process all messages pending, but to not block for new messages
+	{		
 		if (const auto ecode = Window::ProcessMessages())
 		{
-			// if return optional has value, means we're quitting so return exit code
+			// 値がある場合は、終了コードを返す
 			return *ecode;
 		}
 		DoFrame();
@@ -25,6 +25,12 @@ void App::DoFrame()
 {
 	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
 	window.Gfx().ClearBuffer(c, c, 1.0f);
+	// Triangleの作成
+	window.Gfx().DrawTestTriangle(
+		-timer.Peek(),
+		0.0f,
+		0.0f
+	);
 	window.Gfx().DrawTestTriangle(
 		timer.Peek(),
 		window.mouse.GetPosX() / 400.0f - 1.0f,
