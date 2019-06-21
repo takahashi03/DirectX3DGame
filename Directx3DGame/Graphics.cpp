@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include <cmath>
 #include <DirectXMath.h>
+#include "GraphicsThrowMacros.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
@@ -11,22 +12,6 @@ namespace dx = DirectX;
 // DirectX11ƒ‰ƒCƒuƒ‰ƒŠ
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
-
-// graphics exception checking/throwing macros (some with dxgi infos)
-#define GFX_EXCEPT_NOINFO(hresult) Graphics::HresutlException( __LINE__,__FILE__,(hresult) )
-#define GFX_THROW_NOINFO(hrcall) if( FAILED( hresult = (hrcall) ) ) throw Graphics::HresultException( __LINE__,__FILE__,hresult )
-
-#ifndef NDEBUG
-#define GFX_EXCEPT(hresult) Graphics::HresultException( __LINE__,__FILE__,(hresult),infoManager.GetMessages() )
-#define GFX_THROW_INFO(hrcall) infoManager.Set(); if( FAILED( hresult = (hrcall) ) ) throw GFX_EXCEPT(hresult)
-#define GFX_DEVICE_REMOVED_EXCEPT(hresult) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hresult),infoManager.GetMessages() )
-#define GFX_THROW_INFO_ONLY(call) infoManager.Set(); (call); {auto v = infoManager.GetMessages(); if(!v.empty()) {throw Graphics::InfoException( __LINE__,__FILE__,v);}}
-#else
-#define GFX_EXCEPT(hresult) Graphics::HresultException( __LINE__,__FILE__,(hresult) )
-#define GFX_THROW_INFO(hrcall) GFX_THROW_NOINFO(hrcall)
-#define GFX_DEVICE_REMOVED_EXCEPT(hresult) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hresult) )
-#define GFX_THROW_INFO_ONLY(call) (call)
-#endif
 
 Graphics::Graphics(HWND hWnd)
 {
@@ -141,7 +126,6 @@ void Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	const float color[] = { red,green,blue,1.0f };
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 	pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-
 }
 
 void Graphics::DrawTestTriangle(float angle, float x, float z)

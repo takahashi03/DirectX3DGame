@@ -1,12 +1,13 @@
 #include "DxgiInfoManager.h"
 #include "Window.h"
-#include"Graphics.h"
+#include "Graphics.h"
 #include <dxgidebug.h>
 #include <memory>
+#include "GraphicsThrowMacros.h"
+#include "WindowsThrowMacros.h"
 
-#pragma comment(lib,"dxguid.lib")
+#pragma comment(lib, "dxguid.lib")
 
-#define GFX_THROW_NOINFO(hrcall) if( FAILED( hresult = (hrcall) ) ) throw Graphics::HresultException(__LINE__,__FILE__,hresult)
 
 DxgiInfoManager::DxgiInfoManager()
 {
@@ -35,6 +36,8 @@ DxgiInfoManager::DxgiInfoManager()
 
 void DxgiInfoManager::Set() noexcept
 {
+	// set the index (next) so that the next all to GetMessages()
+	// will only get errors generated after this call
 	next = pDxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL);
 }
 
