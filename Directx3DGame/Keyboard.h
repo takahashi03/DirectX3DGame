@@ -59,7 +59,7 @@ public:
 
 private:
 	void OnKeyPressed(unsigned char keycode) noexcept;
-	void OnKerReleased(unsigned char keycode) noexcept;
+	void OnKeyReleased(unsigned char keycode) noexcept;
 	void OnChar(char character) noexcept;
 	void ClearState() noexcept;
 	template<typename T>

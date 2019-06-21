@@ -33,7 +33,7 @@ const std::string & MyException::GetFile() const noexcept
 std::string MyException::GetOriginString() const noexcept
 {
 	std::ostringstream oss;
-	oss << "[File]" << file << std::endl
-		<< "[Line]" << line;
+	oss << "[File] " << file << std::endl
+		<< "[Line] " << line;
 	return oss.str();
 }

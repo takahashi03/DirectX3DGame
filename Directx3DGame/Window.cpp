@@ -18,17 +18,18 @@ Window::WindowClass::WindowClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	// アイコンの設定
 	wc.hIcon = static_cast<HICON>(LoadImage(
 		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 32, 32, 0));
+		IMAGE_ICON, 32, 32, 0
+	));
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
 	wc.hIconSm = static_cast<HICON>(LoadImage(
 		GetInstance(), MAKEINTRESOURCE(IDI_ICON1),
-		IMAGE_ICON, 16, 16, 0));
+		IMAGE_ICON, 16, 16, 0
+	));
 	RegisterClassEx(&wc);
 }
 Window::WindowClass::~WindowClass()
@@ -47,7 +48,8 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 }
 
 // ウィンドウ
-Window::Window(int width, int height, const char* name):
+Window::Window(int width, int height, const char* name)
+	:
 	width(width),
 	height(height)
 {
@@ -95,7 +97,7 @@ void Window::SetTitle(const std::string& title)
 	}
 }
 
-std::optional<int> Window::ProcessMessages()
+std::optional<int> Window::ProcessMessages() noexcept
 {
 	MSG msg;
 	// メッセージがある間、削除してディスパッチ、空ではブロックしない
@@ -117,7 +119,7 @@ std::optional<int> Window::ProcessMessages()
 	return {};
 }
 
-Graphics & Window::Gfx()
+Graphics& Window::Gfx()
 {
 	if (!pGfx)
 	{
@@ -164,6 +166,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_KILLFOCUS:
 		keyboard.ClearState();
 		break;
+
 		// キーボードメッセージ
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
@@ -174,7 +177,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
-		keyboard.OnKerReleased(static_cast<unsigned char>(wParam));
+		keyboard.OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
 		keyboard.OnChar(static_cast<unsigned char>(wParam));
@@ -184,7 +187,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_MOUSEMOVE:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		
+
 		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
 		{
 			mouse.OnMouseMove(pt.x, pt.y);
@@ -193,7 +196,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 				SetCapture(hWnd);
 				mouse.OnMouseEnter();
 			}
-		}		
+		}
 		else
 		{
 			if (wParam & (MK_LBUTTON | MK_RBUTTON))
@@ -212,6 +215,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
+		SetForegroundWindow(hWnd);
 		break;
 	}
 	case WM_RBUTTONDOWN:

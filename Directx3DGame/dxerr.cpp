@@ -94,7 +94,7 @@
              return strOut;
 
 //-----------------------------------------------------
-const WCHAR* WINAPI DXGetErrorStringW( _In_ HRESULT hresult)
+const WCHAR* WINAPI DXGetErrorStringW(_In_ HRESULT hresult)
 {
 #define CHK_ERRA CHK_ERRA_W
 #define CHK_ERR CHK_ERR_W
@@ -109,7 +109,7 @@ const WCHAR* WINAPI DXGetErrorStringW( _In_ HRESULT hresult)
 #undef CHK_ERR
 }
 
-const CHAR* WINAPI DXGetErrorStringA( _In_ HRESULT hresult)
+const CHAR* WINAPI DXGetErrorStringA(_In_ HRESULT hresult)
 {
 #define CHK_ERRA CHK_ERRA_A
 #define CHK_ERR CHK_ERR_A

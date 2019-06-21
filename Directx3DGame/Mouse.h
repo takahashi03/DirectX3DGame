@@ -1,9 +1,6 @@
 #pragma once
 #include <queue>
 #include <optional>
-#pragma once
-#include <queue>
-#include <optional>
 
 class Mouse
 {

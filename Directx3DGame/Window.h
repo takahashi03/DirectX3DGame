@@ -7,21 +7,22 @@
 #include <optional>
 #include <memory>
 
+
 class Window
 {
 public:
-	class Exception :public MyException
+	class Exception : public MyException
 	{
 		using MyException::MyException;
 	public:
-		static std::string TranslateErrorCode(HRESULT hresult)noexcept;
+		static std::string TranslateErrorCode(HRESULT hresult) noexcept;
 	};
-	class HresultException: public Exception
+	class HresultException : public Exception
 	{
 	public:
-		HresultException(int line, const char* file, HRESULT hresult)noexcept;
+		HresultException(int line, const char* file, HRESULT hresult) noexcept;
 		const char* what() const noexcept override;
-		virtual const char* GetType() const noexcept;
+		const char* GetType() const noexcept override;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorDescription() const noexcept;
 	private:
@@ -34,7 +35,7 @@ public:
 		const char* GetType() const noexcept override;
 	};
 private:
-	// シングルトンはウィンドウクラスの登録 / クリーンアップを管理
+	
 	class WindowClass
 	{
 	public:
@@ -45,19 +46,17 @@ private:
 		~WindowClass();
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;
-		static constexpr const char* windowClassName = "Window";
+		static constexpr const char* windowClassName = "Direct3D Engine Window";
 		static WindowClass windowClass;
 		HINSTANCE hInstance;
 	};
 public:
-	// コンストラクタ
 	Window(int width, int height, const char* name);
-	// デスストラクタ
 	~Window();
 	Window(const Window&) = delete;
-	Window& operator = (const Window&) = delete;
+	Window& operator=(const Window&) = delete;
 	void SetTitle(const std::string& title);
-	static std::optional<int> ProcessMessages();
+	static std::optional<int> ProcessMessages() noexcept;
 	Graphics& Gfx();
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -66,11 +65,9 @@ private:
 public:
 	Keyboard keyboard;
 	Mouse mouse;
-
 private:
 	int width;
 	int height;
 	HWND hWnd;
 	std::unique_ptr<Graphics> pGfx;
 };
-

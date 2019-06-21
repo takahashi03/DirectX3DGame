@@ -5,9 +5,14 @@
 #include <wrl.h>
 #include <vector>
 #include "DxgiInfoManager.h"
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
+#include <memory>
+#include <random>
 
 class Graphics
 {
+	friend class Bindable;
 public:
 	class Exception : public MyException
 	{
@@ -16,7 +21,7 @@ public:
 	class HresultException : public Exception
 	{
 	public:
-		HresultException(int line, const char* file, HRESULT hresult, std::vector<std::string> infoMsgs = {})noexcept;
+		HresultException(int line, const char* file, HRESULT hresult, std::vector<std::string> infoMsgs = {}) noexcept;
 		const char* what() const noexcept override;
 		const char* GetType() const noexcept override;
 		HRESULT GetErrorCode() const noexcept;
@@ -37,7 +42,7 @@ public:
 	private:
 		std::string info;
 	};
-	class DeviceRemovedException :public HresultException
+	class DeviceRemovedException : public HresultException
 	{
 		using HresultException::HresultException;
 	public:
@@ -52,19 +57,17 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer(float red, float green, float blue) noexcept;
-	void DrawTestTriangle(float angle, float x, float y);
+	void DrawIndexed(UINT count) noexcept(!IS_DEBUG);
+	void SetProjection(DirectX::FXMMATRIX proj) noexcept;
+	DirectX::XMMATRIX GetProjection() const noexcept;
 private:
+	DirectX::XMMATRIX projection;
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
 #endif
-	// Directx11のデバイス
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	// 画面出力用のスワップチェイン
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
-	// 描画用のデバイスコンテキスト
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
-	// レンダラーターゲット
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;	
-	// 深度ステンシルビュー
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 };

@@ -3,7 +3,7 @@ return;
 
 *desc = 0;
 
-// First try to see if FormatMessage knows this hr
+// First try to see if FormatMessage knows this hresult
 UINT icount = static_cast<UINT>(std::min<size_t>(count, 32767));
 
 DWORD result = DX_FORMATMESSAGE(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hresult,

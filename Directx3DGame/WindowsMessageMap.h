@@ -1,12 +1,12 @@
 #pragma once
 #include <unordered_map>
-#include <Windows.h>
+#include "MyWindows.h"
 
 class WindowsMessageMap
 {
 public:
-	WindowsMessageMap();
-	std::string operator()(DWORD msg, LPARAM lp, WPARAM wp) const;
+	WindowsMessageMap() noexcept;
+	std::string operator()(DWORD msg, LPARAM lp, WPARAM wp) const noexcept;
 private:
 	// unordered_map
 	// 重複不可能な順不同のmap(ハッシュによる連想配列)

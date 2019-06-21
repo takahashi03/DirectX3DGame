@@ -49,11 +49,11 @@ void WINAPI DXGetErrorDescriptionA( _In_ HRESULT hresult, _Out_cap_(count) CHAR*
 //                         __FILEW__ macro.
 //         DWORD dwLine    The current line number, typically passed in using the 
 //                         __LINE__ macro.
-//         HRESULT hr      An HRESULT that will be traced to the debug stream.
+//         HRESULT hresult      An HRESULT that will be traced to the debug stream.
 //         CHAR* strMsg    A string that will be traced to the debug stream (may be NULL)
 //         BOOL bPopMsgBox If TRUE, then a message box will popup also containing the passed info.
 //
-//  Return: The hr that was passed in.  
+//  Return: The hresult that was passed in.  
 //--------------------------------------------------------------------------------------
 HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hresult, _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox );
 //--------------------------------------------------------------------------------------
@@ -65,11 +65,11 @@ HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HR
 //                         __FILE__ macro.
 //         DWORD dwLine    The current line number, typically passed in using the 
 //                         __LINE__ macro.
-//         HRESULT hr      An HRESULT that will be traced to the debug stream.
+//         HRESULT hresult      An HRESULT that will be traced to the debug stream.
 //         CHAR* strMsg    A string that will be traced to the debug stream (may be NULL)
 //         BOOL bPopMsgBox If TRUE, then a message box will popup also containing the passed info.
 //
-//  Return: The hr that was passed in.  
+//  Return: The hresult that was passed in.  
 //--------------------------------------------------------------------------------------
 HRESULT WINAPI DXTraceA( _In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hresult, _In_opt_ const CHAR* strMsg, _In_ bool bPopMsgBox );
 #ifdef UNICODE
@@ -84,11 +84,11 @@ HRESULT WINAPI DXTraceA( _In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRE
 //--------------------------------------------------------------------------------------
 #if defined(DEBUG) || defined(_DEBUG)
 #ifdef UNICODE
-#define DXTRACE_MSG(str)              DXTrace( __FILEW__, (DWORD)__LINE__, 0, str, false )
+#define DXTRACE_MSG(str)                    DXTrace( __FILEW__, (DWORD)__LINE__, 0, str, false )
 #define DXTRACE_ERR(str,hresult )           DXTrace( __FILEW__, (DWORD)__LINE__, hresult , str, false )
 #define DXTRACE_ERR_MSGBOX(str,hresult )    DXTrace( __FILEW__, (DWORD)__LINE__, hresult , str, true )
 #else
-#define DXTRACE_MSG(str)              DXTrace( __FILE__, (DWORD)__LINE__, 0, str, false )
+#define DXTRACE_MSG(str)                    DXTrace( __FILE__, (DWORD)__LINE__, 0, str, false )
 #define DXTRACE_ERR(str,hresult )           DXTrace( __FILE__, (DWORD)__LINE__, hresult , str, false )
 #define DXTRACE_ERR_MSGBOX(str,hresult )    DXTrace( __FILE__, (DWORD)__LINE__, hresult , str, true )
 #endif
