@@ -63,5 +63,8 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
 	// 描画用のデバイスコンテキスト
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
+	// レンダラーターゲット
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;	
+	// 深度ステンシルビュー
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 };
