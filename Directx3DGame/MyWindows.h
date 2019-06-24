@@ -5,7 +5,7 @@
 #include <sdkddkver.h>
 
 // 定義すれば、未使用を無効にできる
-
+#ifndef FULL_WINTARD
 #define WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
 #define NOSYSMETRICS
@@ -40,7 +40,9 @@
 #define NOPROXYSTUB
 #define NOIMAGE
 #define NOTAPE
+#endif
 
+#define NOMINMAX
 // コンパイル時のエラーチェックを厳密に行う宣言
 #define STRICT
 
