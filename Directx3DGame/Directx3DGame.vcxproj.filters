@@ -34,6 +34,9 @@
     <Filter Include="ソース ファイル\Drawable">
       <UniqueIdentifier>{6effcb9f-d2ea-4b19-9201-341b8260d1fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Geometry">
+      <UniqueIdentifier>{95981a48-f86e-49dc-8b58-0cb482a519b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -97,6 +100,12 @@
       <Filter>ソース ファイル\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="Box.cpp">
+      <Filter>ソース ファイル\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Melon.cpp">
+      <Filter>ソース ファイル\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="Pyramid.cpp">
       <Filter>ソース ファイル\Drawable</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,6 +191,33 @@
     <ClInclude Include="DrawableBase.h">
       <Filter>ヘッダー ファイル\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="IndexedTriangleList.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Cone.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="MyMath.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Prism.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>ヘッダー ファイル\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Melon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Pyramid.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Directx3DGame.rc">
@@ -209,6 +245,18 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorBlendPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorBlendVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorIndexPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorIndexVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
