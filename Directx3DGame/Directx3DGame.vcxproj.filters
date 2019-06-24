@@ -179,6 +179,9 @@
     <ClInclude Include="Drawable.h">
       <Filter>ヘッダー ファイル\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="DrawableBase.h">
+      <Filter>ヘッダー ファイル\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Directx3DGame.rc">
