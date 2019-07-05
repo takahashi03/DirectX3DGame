@@ -1,9 +1,5 @@
 #include "App.h"
-#include "Melon.h"
-#include "Pyramid.h"
 #include "Box.h"
-#include "Sheet.h"
-#include "SkinnedBox.h"
 #include <memory>
 #include <algorithm>
 #include "MyMath.h"
@@ -17,7 +13,8 @@ GDIPlusManager gdipm;
 
 App::App()
 	:
-	window(800, 600, "Window Title")
+	window(800, 600, "Window Title"),
+	light(window.Gfx())
 {
 	class Factory
 	{
@@ -28,37 +25,11 @@ App::App()
 		{}
 		std::unique_ptr<Drawable> operator()()
 		{
-			switch (typedist(rng))
-			{
-			case 0:
-				return std::make_unique<Pyramid>(
-					gfx, rng, adist, ddist,
-					odist, rdist
-					);
-			case 1:
-				return std::make_unique<Box>(
-					gfx, rng, adist, ddist,
-					odist, rdist, bdist
-					);
-			case 2:
-				return std::make_unique<Melon>(
-					gfx, rng, adist, ddist,
-					odist, rdist, longdist, latdist
-					);
-			case 3:
-				return std::make_unique<Sheet>(
-					gfx, rng, adist, ddist,
-					odist, rdist
-					);
-			case 4:
-				return std::make_unique<SkinnedBox>(
-					gfx, rng, adist, ddist,
-					odist, rdist
-					);
-			default:
-				assert(false && "bad drawable type in factory");
-				return {};
-			}
+
+			return std::make_unique<Box>(
+				gfx, rng, adist, ddist,
+				odist, rdist, bdist
+				);
 		}
 	private:
 		Graphics& gfx;
@@ -67,17 +38,14 @@ App::App()
 		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
 		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
-		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
-		std::uniform_int_distribution<int> latdist{ 5,20 };
-		std::uniform_int_distribution<int> longdist{ 10,40 };
-		std::uniform_int_distribution<int> typedist{ 0,4 };
+		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };		
 	};
 
 	drawables.reserve(nDrawables);
 	std::generate_n(std::back_inserter(drawables), nDrawables, Factory{ window.Gfx() });
 
-window.Gfx().SetProjection(dx::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
-	
+	window.Gfx().SetProjection(dx::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
+
 }
 
 int App::Go()
@@ -99,16 +67,17 @@ App::~App()
 
 void App::DoFrame()
 {
-
 	const auto dt = timer.Mark() * speed_factor;
 	window.Gfx().BeginFrame(0.07f, 0.0f, 0.12f);
 	window.Gfx().SetCamera(cam.GetMatrix());
+	light.Bind(window.Gfx());
 
 	for (auto& d : drawables)
 	{
 		d->Update(window.keyboard.KeyIsPressed(VK_SPACE) ? 0.0f : dt);
 		d->Draw(window.Gfx());
 	}
+	light.Draw(window.Gfx());
 
 	// imgui window to control simulation speed
 	if (ImGui::Begin("Simulation Speed"))
@@ -118,8 +87,9 @@ void App::DoFrame()
 		ImGui::Text("Status: %s", window.keyboard.KeyIsPressed(VK_SPACE) ? "PAUSED" : "RUNNING (hold spacebar to pause)");
 	}
 	ImGui::End();
-	// imgui window to control camera
+	// imgui windows to control camera and light
 	cam.SpawnControlWindow();
+	light.SpawnControlWindow();
 
 	// present
 	window.Gfx().EndFrame();
