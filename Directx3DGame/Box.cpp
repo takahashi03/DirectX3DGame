@@ -3,24 +3,25 @@
 #include "GraphicsThrowMacros.h"
 #include "Cube.h"
 
-Box::Box( Graphics& gfx,
+Box::Box(Graphics& gfx,
 	std::mt19937& rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
 	std::uniform_real_distribution<float>& rdist,
-	std::uniform_real_distribution<float>& bdist)
+	std::uniform_real_distribution<float>& bdist,
+	DirectX::XMFLOAT3 material)
 	:
-	r( rdist( rng ) ),
-	droll( ddist( rng ) ),
-	dpitch( ddist( rng ) ),
-	dyaw( ddist( rng ) ),
-	dphi( odist( rng ) ),
-	dtheta( odist( rng ) ),
-	dchi( odist( rng ) ),
-	chi( adist( rng ) ),
-	theta( adist( rng ) ),
-	phi( adist( rng ) )
+	r(rdist(rng)),
+	droll(ddist(rng)),
+	dpitch(ddist(rng)),
+	dyaw(ddist(rng)),
+	dphi(odist(rng)),
+	dtheta(odist(rng)),
+	dchi(odist(rng)),
+	chi(adist(rng)),
+	theta(adist(rng)),
+	phi(adist(rng))
 {
 	namespace dx = DirectX;
 
@@ -60,6 +61,16 @@ Box::Box( Graphics& gfx,
 
 	AddBind(std::make_unique<TransformCbuf>(gfx, *this));
 
+	struct PSMaterialConstant
+	{
+		alignas(16) dx::XMFLOAT3 color;
+		float specularIntensity = 0.6f;
+		float specularPower = 30.0f;
+		float padding[2];
+	} colorConst;
+	colorConst.color = material;
+	AddBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u));
+
 	// model deformation transform (per instance, not stored as bind)
 	dx::XMStoreFloat3x3(
 		&mt,
@@ -67,7 +78,7 @@ Box::Box( Graphics& gfx,
 	);
 }
 
-void Box::Update( float dt ) noexcept
+void Box::Update(float dt) noexcept
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;

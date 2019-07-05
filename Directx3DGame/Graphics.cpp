@@ -175,7 +175,7 @@ void Graphics::SetCamera(DirectX::FXMMATRIX cam) noexcept
 	camera = cam;
 }
 
-DirectX::XMMATRIX Graphics::GetCamra() const noexcept
+DirectX::XMMATRIX Graphics::GetCamera() const noexcept
 {
 	return camera;
 }
