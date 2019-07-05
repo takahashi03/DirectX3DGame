@@ -323,6 +323,9 @@
     <ClInclude Include="SolidSphere.h">
       <Filter>ヘッダー ファイル\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="TestObject.h">
+      <Filter>ヘッダー ファイル\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Directx3DGame.rc">
