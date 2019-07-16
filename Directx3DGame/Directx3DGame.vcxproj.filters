@@ -159,6 +159,9 @@
     <ClCompile Include="SolidSphere.cpp">
       <Filter>ソース ファイル\Drawable</Filter>
     </ClCompile>
+    <ClCompile Include="Cylinder.cpp">
+      <Filter>ソース ファイル\Drawable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowsMessageMap.h">
@@ -326,6 +329,9 @@
     <ClInclude Include="TestObject.h">
       <Filter>ヘッダー ファイル\Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Cylinder.h">
+      <Filter>ヘッダー ファイル\Drawable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Directx3DGame.rc">
@@ -383,6 +389,15 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="SolidVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="IndexedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BlendedPhongVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>
