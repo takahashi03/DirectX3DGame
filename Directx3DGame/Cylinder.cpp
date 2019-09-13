@@ -48,7 +48,7 @@ Cylinder::Cylinder(Graphics& gfx, std::mt19937& rng,
 		AddStaticBind(std::make_unique<PixelConstantBuffer<PSMaterialConstant>>(gfx, matConst, 1u));
 	}
 	struct Vertex
-	{ 
+	{
 		dx::XMFLOAT3 pos;
 		dx::XMFLOAT3 n;
 	};
